@@ -1,0 +1,4 @@
+{
+    "$schema": "https://raw.githubusercontent.com/kian-web/server/main/config_schema.json",
+    "db": "mongodb://user:pass@mongodb.example.com:27017"
+}
