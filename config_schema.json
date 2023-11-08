@@ -1,0 +1,15 @@
+{
+  "properties": {
+    "db": {
+      "format": "multi-host-uri",
+      "minLength": 1,
+      "title": "Db",
+      "type": "string"
+    }
+  },
+  "required": [
+    "db"
+  ],
+  "title": "ConfigModel",
+  "type": "object"
+}

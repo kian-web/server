@@ -1,3 +1,4 @@
+from typing_extensions import Unpack
 from beanie import Document, Link, BackLink
 from uuid import UUID, uuid1
 from pydantic import BaseModel, Field, EmailStr
@@ -7,66 +8,82 @@ from typing import Optional
 from enum import Enum
 
 
-class Teacher(Document):
+def to_camel(string: str) -> str:
+    string_split = string.split("_")
+    return string_split[0] + "".join(word.capitalize() for word in string_split[1:])
+
+
+class MyBaseModel(BaseModel):
+    class config:
+        alias_generator = to_camel
+
+
+DOCUMENTS_LIST = []
+
+
+class MyDocument(Document):
+    class config:
+        alias_generator = to_camel
+
+    def __init_subclass__(cls, **kwargs):
+        DOCUMENTS_LIST.append(cls)
+        return super().__init_subclass__(**kwargs)
+
+
+class Teacher(MyDocument):
     id: UUID = Field(default_factory=uuid1)
+    name: str
     email: EmailStr
     pass_hash: str
     courses: list[Link["Course"]]
+    disabled: bool = False
 
 
-class ClassState(Enum, str):
+class ClassState(str, Enum):
     nothing = "nothing"
     register = "register"
     attendance = "attendance"
 
 
-class Course(Document):
-    name: str
+class Course(MyDocument):
     id: UUID = Field(default_factory=uuid1)
-    owner: Link[Teacher]
+    name: str
+    owner: BackLink[Teacher] = Field(original_field="id")
+    teachers: list[Link[Teacher]]
     students: list[Link["Student"]]
     sessions: list[Link["Session"]]
-    state: ClassState
 
 
-class Score(BaseModel):
+class Score(MyBaseModel):
     datetime: datetime
     value: float
     note: Optional[str] = None
 
 
-class Student(Document):
+class Student(MyDocument):
     client_id: Optional[UUID] = None
     student_id: int
-    course_id: UUID
+    course: Link[Course]
     name: str
     attendances: list[Link["Attendance"]]
-    scores: list[Link[Score]]
+    scores: list[Score]
+    state: ClassState
 
     class Settings:
         indexes = [
-            IndexModel("student_id", "course", unique=True),
+            IndexModel(("student_id", "course"), unique=True),
             IndexModel("client_id", unique=True),
         ]
 
 
-class Session(Document):
+class Session(MyDocument):
     id: UUID
     name: str
-    datetime: datetime = Field(default_factory=datetime.now)
+    start_datetime: datetime = Field(default_factory=datetime.now)
     attendances: list[Link["Attendance"]]
-    course_id: UUID
+    course: BackLink[Course] = Field(original_field="id")
     state: ClassState
 
 
-class AttendanceStatus(Enum, str):
-    present = "present"
-    absent = "absent"
-    late = "late"
-
-
-class Attendance(Document):
-    time: time
-    student: BackLink[Student] = Field(original_field="id")
-    session: BackLink[Session] = Field(original_field="id")
-    status: AttendanceStatus
+class Attendance(MyDocument):
+    attendance_time: time = Field(default_factory=lambda: datetime.now().time())
