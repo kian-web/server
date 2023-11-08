@@ -1,11 +1,21 @@
-from pydantic import BaseModel as BaseModel, EmailStr, SecretStr, RootModel, MongoDsn
+from pydantic import (
+    BaseModel as BaseModel,
+    EmailStr,
+    SecretStr,
+    RootModel,
+    MongoDsn,
+    Field,
+)
 from fastapi import Form
 from uuid import UUID
 from typing import Literal, Annotated
 
 
 class ConfigModel(BaseModel):
-    db: MongoDsn
+    db: MongoDsn = Field(
+        examples=["mongodb://user:pass@mongodb.example.com:27017"],
+        description="mongodb link to your database",
+    )
 
 
 def to_camel(string: str) -> str:

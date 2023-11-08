@@ -1,15 +1,1 @@
-{
-  "properties": {
-    "db": {
-      "format": "multi-host-uri",
-      "minLength": 1,
-      "title": "Db",
-      "type": "string"
-    }
-  },
-  "required": [
-    "db"
-  ],
-  "title": "ConfigModel",
-  "type": "object"
-}
+{"properties": {"db": {"description": "mongodb link to your database", "examples": ["mongodb://user:pass@mongodb.example.com:27017"], "format": "multi-host-uri", "minLength": 1, "title": "Db", "type": "string"}}, "required": ["db"], "title": "ConfigModel", "type": "object"}
