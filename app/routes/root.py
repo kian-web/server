@@ -8,7 +8,7 @@ from app.models.docs import *
 from beanie.operators import In
 from uuid import uuid1
 
-router = APIRouter(prefix="/")
+router = APIRouter()
 
 
 @router.post("/register")

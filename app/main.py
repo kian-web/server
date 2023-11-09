@@ -12,7 +12,7 @@ config = schema.ConfigModel.model_validate_json(open("config.json").read())
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    client = AsyncIOMotorClient(config.db)
+    client = AsyncIOMotorClient(str(config.db))
     await init_beanie(database=client.db_name, document_models=docs.DOCUMENTS_LIST)
     yield
 

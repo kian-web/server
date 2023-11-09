@@ -16,6 +16,10 @@ class ConfigModel(BaseModel):
         examples=["mongodb://user:pass@mongodb.example.com:27017"],
         description="mongodb link to your database",
     )
+    enable_teacher_signup: bool = Field(
+        default=False,
+        description="This option will enable everyone to signup as a teacher",
+    )
 
 
 def to_camel(string: str) -> str:

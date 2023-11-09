@@ -1,4 +1,1 @@
-from .admin import router
-from . import course
-
-router.include_router(course.router)
+from admin import router
