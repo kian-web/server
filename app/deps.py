@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status, Path
+from fastapi import Depends, HTTPException, status, Path, Request
 from fastapi.security import SecurityScopes, OAuth2PasswordBearer
 from typing import Annotated
 from jose import jwt, JWTError
@@ -41,3 +41,8 @@ async def get_current_user(
         return user
     except (JWTError, ValidationError):
         raise credentials_exception
+
+
+async def from_local(req: Request):
+    if req.client.host not in ("127.0.0.1", "localhost"):
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
