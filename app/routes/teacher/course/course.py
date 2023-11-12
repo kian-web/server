@@ -5,6 +5,7 @@ from app.models import schema
 from app.models.docs import Teacher, Course
 from app.deps import get_current_user
 from beanie.operators import All
+from beanie import WriteRules
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
@@ -26,3 +27,12 @@ async def get_course(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     await course.fetch_link(Course.owner)
     return course
+
+
+@router.post("/new-course")
+async def create_new_course(
+    user: Annotated[Teacher, Depends(get_current_user)], data: schema.NewCourse
+):
+    new_course = Course(name=data.name, teachers=[user])
+    user.courses.append(new_course)
+    await user.save(link_rule=WriteRules.WRITE)
